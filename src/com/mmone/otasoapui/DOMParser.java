@@ -41,7 +41,22 @@ public class DOMParser {
     */
     public DOMParser (String directoryIn, String directoryOut) {
         this.directoryIn = directoryIn;
-        this.directoryOut = directoryOut;
+        System.out.println(" directoryOut=" + directoryOut  );
+        
+        String[] aPath = directoryOut.split("/");
+        String res = "";
+        
+        for (int i = 0; i < aPath.length-2; i++) {
+            
+            if(i>0)
+            	res+="/"+aPath[i];
+            else
+            	res+=aPath[i];	
+        }
+        
+        
+        
+        this.directoryOut = res+"/res_";
     }
     
     
@@ -108,36 +123,7 @@ public class DOMParser {
         System.out.println("getHotelReservationID = " + getHotelReservationID());
         System.out.println("getEchoToken = " + getEchoToken());
     }// AnalisiDOM
-    
-    
-    // versione standard
-    /*public void esaminaNodo(Node nodo) {
-		switch(nodo.getNodeType()) {
-			case Node.ELEMENT_NODE:
-				System.out.println("Elemento: " + nodo.getNodeName());
-				NamedNodeMap attributi = nodo.getAttributes();
-				if(attributi.getLength() > 0) {
-					System.out.println("\tAttributi: ");
-					for(int i=0; i<attributi.getLength(); i++) {
-						Attr attributo = (Attr) attributi.item(i);
-						System.out.print(attributo.getNodeName() + "=" + attributo.getNodeValue() + " ");
-					}
-					System.out.println();
-				}
-				esaminaFigli(nodo.getChildNodes());
-				System.out.println("Fine elemento: " + nodo.getNodeName());
-				break;
-		case Node.CDATA_SECTION_NODE:
-		case Node.TEXT_NODE:
-			Text testo = (Text)nodo;
-			if(!testo.getNodeValue().trim().equals(""))
-				System.out.println("\tTesto; " + testo.getNodeValue());
-			break;
-		}
-    }// esaminaNodo
-    */
-    
-    // versione mia
+  
     public String esaminaNodo(Node nodo) {
         String echoT = "";        
         String hotelResID = "";        
@@ -175,9 +161,8 @@ public class DOMParser {
                                         //System.out.println(hotelReservation.toString());
                                         try{
                                             // Create file
-                                            //System.out.println(outfile);
-                                            //FileWriter fstream = new FileWriter(directoryOut + outfile);
-                                            FileWriter fstream = new FileWriter(directoryOut );
+                                            //System.out.println(" directoryOut=" + directoryOut + " outfile = "+outfile);
+                                            FileWriter fstream = new FileWriter(directoryOut + outfile);  
                                             BufferedWriter out = new BufferedWriter(fstream);
                                             out.write(hotelReservation.toString());
                                             //Close the output stream
@@ -224,4 +209,17 @@ public class DOMParser {
         return echoToken;
     }
     
+    public static void main(String[] args) {
+        String path = "c:/etgroup-reservations/reservations/hsavoy/res";
+        
+        String[] aPath = path.split("/");
+        String res = "";
+        
+        for (int i = 0; i < aPath.length-2; i++) {
+            res+=aPath[i];
+        }
+        
+        System.out.println(res);
+        
+    }
 }

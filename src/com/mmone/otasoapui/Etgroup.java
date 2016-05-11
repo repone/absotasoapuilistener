@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mmone.otasoapui;
 
 import java.io.ByteArrayInputStream;
@@ -21,7 +17,7 @@ public class Etgroup {
     public static void main(String[] args) {
         // TODO code application logic here
         System.out.println("Inizio elaborazione documento");
-        String pathIN = "//FILESERVER/webdesign/maurolarese/java/";
+        String pathIN = "//FILESERVER/webdesign/danielefioretto/java/";
         String pathOUT = "";
         System.out.println("Percorso file = "+pathIN);
         
