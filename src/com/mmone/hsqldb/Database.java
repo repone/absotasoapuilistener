@@ -24,6 +24,7 @@ public class Database {
     public QueryRunner getQueryRunner() {
         return qr;
     }
+ 
     private String dbParh;
     
     public Database(String dbPath) {
@@ -38,7 +39,7 @@ public class Database {
         JDBCDataSource ds = new JDBCDataSource();
         ds.setDatabase("jdbc:hsqldb:" + dbParh);
         conn = ds.getConnection("sa", "");
-        QueryRunner qr = new QueryRunner(ds);
+        qr = new QueryRunner(ds);
     }
     
     public void shutDown() throws SQLException{

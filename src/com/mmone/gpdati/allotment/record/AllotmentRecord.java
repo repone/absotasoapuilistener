@@ -59,6 +59,19 @@ public class AllotmentRecord {
         return DateFormatUtils.format( getJDate()  , "yyyyMMdd");
     }
 
+    public String getDate(String dtFormat) throws ParseException { 
+        return DateFormatUtils.format( getJDate()  , dtFormat);
+    }
+    
+    public String getDateY_M_D() throws ParseException { 
+        String dtFormat="yyyy-MM-dd";
+        return DateFormatUtils.format( getJDate()  , dtFormat);
+    }
+    public String getDateD_M_Y() throws ParseException { 
+        String dtFormat="dd-MM-yyyy";
+        return DateFormatUtils.format( getJDate()  , dtFormat);
+    }
+    
     public Date getJDate() throws ParseException {
         return  DateUtils.parseDate(date, "ddMMyyyy")     ;
     }
