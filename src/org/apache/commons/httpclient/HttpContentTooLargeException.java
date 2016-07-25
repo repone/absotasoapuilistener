@@ -1,9 +1,9 @@
 package org.apache.commons.httpclient;
 
-/**
+/** 
  * Signals that the response content was larger than anticipated. 
  * 
- * @author Ortwin Glück
+ * @author Ortwin Glï¿½ck
  */
 public class HttpContentTooLargeException extends HttpException {
     private int maxlen;

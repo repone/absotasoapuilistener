@@ -5,6 +5,9 @@
  */
 package com.mmone.gpdati.config;
 
+import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
+import com.mmone.gpdati.allotment.reader.AllotmentLineProvvider;
+import com.mmone.gpdati.allotment.record.AllotmentRecordsListBuilder;
 import com.mmone.hsqldb.Database;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -15,29 +18,42 @@ import org.apache.xmlrpc.XmlRpcClient;
  *
  * @author mauro.larese
  */
-public class GpDatiComponentsFactory {
+public class GpDatiObjectsFactory {
     GpDatiXmlRpcConfigurator xmlRpcConfigurator=null;
     Database database=null; 
     GpDatiProperties properties;
     GpdDbRoomMap roomMap=null;
-    XmlRpcClient xmlRpcClient=null;
+    XmlRpcClient xmlRpcClient=null; 
+    AllotmentRecordsListBuilder allotmentRecordsListBuilder = null;
 
+    public AllotmentRecordsListBuilder getAllotmentRecordsListBuilder() {
+        if(allotmentRecordsListBuilder==null){
+            AllotmentLineProvvider afr = new AllotmentFileReader(properties.getAvailFileName()); 
+            allotmentRecordsListBuilder = new AllotmentRecordsListBuilder(afr);
+        }
+        return allotmentRecordsListBuilder;
+    }
+            
     public GpdDbRoomMap getRoomMap() {
         if(roomMap==null)
-            roomMap = new GpdDbRoomMap(database);
+            roomMap = new GpdDbRoomMap( getDatabase());
         return roomMap;
     }
 
      
     public void cleanUp(){
         try {
-            database.shutDown();
+            if(database!=null){
+                database.shutDown();
+                database=null;
+            }
+            
             xmlRpcClient=null;
         } catch (SQLException ex) {
-            Logger.getLogger(GpDatiComponentsFactory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GpDatiObjectsFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public GpDatiComponentsFactory(GpDatiProperties properties ) {  
+    public GpDatiObjectsFactory(GpDatiProperties properties ) {  
         this.properties=properties;
     }
     
