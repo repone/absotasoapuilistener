@@ -11,7 +11,7 @@ import java.util.Hashtable;
  *
  * @author mauro.larese
  */
-public interface IGpdRoomMap {
-    void put(String gpstructure,String gproom,GpdRoomRecord record);
-    GpdRoomRecord get(String gpstructure,String gproom);
+public interface IGpDatiRoomMap {
+    void put(String gpstructure,String gproom,GpDatiRoomRecord record);
+    GpDatiRoomRecord get(String gpstructure,String gproom);
 }

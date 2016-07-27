@@ -5,6 +5,7 @@
  */
 package com.mmone.gpdati.config;
 
+import com.mmone.otasoapui.AllotmentUpdatePropertiesCollector;
 import java.util.Date;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -20,23 +21,17 @@ public class GpDatiProperties {
     private String rpcPassword; 
     private String rpcUrl; 
     private String dbPath; 
-
-    public String getAvailFileName() {
-        return availFileName;
-    }
     private String availFileName; 
-
-    public void setAvailFileName(String availFileName) {
-        this.availFileName = availFileName;
+    private boolean availUpdated; 
+    
+    public GpDatiProperties(AllotmentUpdatePropertiesCollector p) {
+        this( p.getRpcUser(),p.getRpcPwd(),p.getRpcUrl(),p.getDbPath(),p.getAvailFile());
     }
-
     public GpDatiProperties(String rpcUser, String rpcPassword, String rpcUrl, String dbPath, String availFileName) {
         this(rpcUser,rpcPassword,rpcUrl,dbPath);
         this.availFileName = availFileName;
     }
-    
-    
-
+     
     public GpDatiProperties(String rpcUser, String rpcPassword, String rpcUrl, String dbPath) {
         this(rpcUser,rpcPassword,rpcUrl); 
         this.dbPath = dbPath;
@@ -52,21 +47,17 @@ public class GpDatiProperties {
     public GpDatiProperties() {
     }
     
+     public String getAvailFileName() {
+        return availFileName;
+    }
+  
     public String getRpcUser() {
         return rpcUser;
     }
     public String getDbPath() {
         return dbPath;
     }
-
-    public void setDbPath(String dbPath) {
-        this.dbPath = dbPath;
-    }
-
-    public void setRpcUser(String rpcUser) {
-        this.rpcUser = rpcUser;
-    }
-
+ 
     public String getRpcPassword() {
         return rpcPassword;
     }
@@ -78,11 +69,7 @@ public class GpDatiProperties {
     public String getRpcUrl() {
         return rpcUrl;
     }
-
-    public void setRpcUrl(String rpcUrl) {
-        this.rpcUrl = rpcUrl;
-    }
-    
+ 
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.MULTI_LINE_STYLE); 

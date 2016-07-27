@@ -38,10 +38,11 @@ public class AbsOtaListener implements  RequestFilter{
 
     @Override
     public void afterRequest(SubmitContext sc, Request rqst) {
-       
+      
+      System.out.println( "Request Listener ---------> " + rqst.getName() );  
       if( rqst.getName().equals("OTA_NotifReport")) return;
       
-      System.out.println( "Request ---------> " + rqst.getName() );
+      
       WsdlSinglePartHttpResponse response = ( WsdlSinglePartHttpResponse) sc.getProperty(BaseHttpRequestTransport.RESPONSE);
       String hotel = (String)SoapUI.getGlobalProperties().getPropertyValue("abs.name");
       String path = savePath+hotel+"/res_"; 

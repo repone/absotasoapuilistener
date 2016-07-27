@@ -35,7 +35,7 @@ public class AllotmentFileReader implements AllotmentLineProvvider {
             loadData();
         return lines;
     }
-    
+     
     public static void main(String[] args) {
         try {
             AllotmentLineProvvider afr = new AllotmentFileReader("C:/svnprjects/mauro_netbprj/abs-ota-soapui-listener/test/FILE_DISPO__20160616.txt");

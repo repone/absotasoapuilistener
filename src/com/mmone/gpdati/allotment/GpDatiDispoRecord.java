@@ -14,9 +14,9 @@ import org.apache.commons.lang3.text.StrTokenizer;
  *
  * @author mauro.larese
  */
-public class GpdDispoRecord {
+public class GpDatiDispoRecord {
 
-    public GpdDispoRecord() {
+    public GpDatiDispoRecord() {
     }
     
     private String key;
@@ -30,7 +30,7 @@ public class GpdDispoRecord {
         return key;
     }
 
-    public GpdDispoRecord(String key) {
+    public GpDatiDispoRecord(String key) {
         setKey(key) ;
     }
 
@@ -79,7 +79,7 @@ public class GpdDispoRecord {
     
     public static void main(String[] args) {
         String tk = "1|1|13|2016-10-27|2016-10-28";
-        GpdDispoRecord d = new GpdDispoRecord(tk);
+        GpDatiDispoRecord d = new GpDatiDispoRecord(tk);
         
         System.out.println(d);
     }

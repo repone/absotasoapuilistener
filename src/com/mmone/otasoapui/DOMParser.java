@@ -41,7 +41,8 @@ public class DOMParser {
     */
     public DOMParser (String directoryIn, String directoryOut) {
         this.directoryIn = directoryIn;
-        System.out.println(" directoryOut=" + directoryOut  );
+        System.out.println("[DOMParser] directoryOut=" + directoryOut  );
+        System.out.println("[DOMParser] directoryIn=" + directoryIn  );
         
         String[] aPath = directoryOut.split("/");
         String res = "";
@@ -56,7 +57,8 @@ public class DOMParser {
         
         
         
-        this.directoryOut = res+"/res_";
+        this.directoryOut = directoryOut ;
+        System.out.println("[DOMParser] calculated directoryOut=" + this.directoryOut  );
     }
     
     
@@ -71,7 +73,10 @@ public class DOMParser {
                 this.file = file;
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder domParser = dbf.newDocumentBuilder();
-
+                
+                System.out.println("directoryIn="+directoryIn);
+                System.out.println("file="+file);
+                
                 d = domParser.parse(new File(directoryIn + file));
                 r = d.getDocumentElement();
                 esaminaNodo(r);

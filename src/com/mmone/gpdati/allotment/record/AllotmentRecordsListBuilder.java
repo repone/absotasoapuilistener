@@ -7,6 +7,8 @@ package com.mmone.gpdati.allotment.record;
 
 import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
 import com.mmone.gpdati.allotment.reader.AllotmentLineProvvider;
+import com.mmone.gpdati.config.GpDatiDbRoomMap;
+import com.mmone.gpdati.config.GpDatiRoomRecord;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -19,11 +21,15 @@ import java.util.logging.Logger;
 public class AllotmentRecordsListBuilder {
     private AllotmentLineProvvider linePrv;
     private List<AllotmentRecord> records=null;
+    private GpDatiDbRoomMap roomMap=null;
     
     public AllotmentRecordsListBuilder(AllotmentLineProvvider linePrv) {
         this.linePrv = linePrv;
     }
-    
+    public AllotmentRecordsListBuilder(AllotmentLineProvvider linePrv,GpDatiDbRoomMap roomMap) {
+        this(linePrv);
+        this.roomMap=roomMap; 
+    }
     private void buildRecordList() throws Exception{
         List<String> lines = linePrv.getLines();
         records = new ArrayList<AllotmentRecord>();
@@ -40,13 +46,27 @@ public class AllotmentRecordsListBuilder {
                if(al<0)  al = 0;
             } catch (Exception e) { }
             
-            r
-                .setHotel( h )
-                .setRcode( rc )
-                .setDate(dt)
-                .setAllotment( al )
-            ;
-            records.add(r);
+            if(roomMap!=null){
+                 GpDatiRoomRecord room= roomMap.get(h, rc); 
+                 if(room!=null){ 
+                     h= new Integer(room.getAbsstru()).toString() ;
+                     rc= new Integer(room.getAbsroom()).toString() ;
+                 }else{
+                     room=roomMap.insert(h, rc);
+                 }
+                 if(!h.equals("0") && !rc.equals("0")){
+                     r
+                        .setHotel( h )
+                        .setRcode( rc )
+                        .setDate(dt)
+                        .setAllotment( al )
+                    ;
+                    records.add(r);
+                 }
+                 
+            }
+            
+            
         }
          
     }

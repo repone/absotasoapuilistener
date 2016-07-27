@@ -13,10 +13,25 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  *
  * @author mauro.larese
  */
-public class GpdRoomRecord {
+public class GpDatiRoomRecord {
     private int id;
     private String gpstru;
     private String gproom;
+
+    public GpDatiRoomRecord() {
+    }
+
+    public GpDatiRoomRecord(String gpstru, String gproom) {
+        this(gpstru,gproom,0,0,0); 
+    }
+
+    public GpDatiRoomRecord(String gpstru, String gproom, int absstru, int absroom, int perc) {
+        this.gpstru = gpstru;
+        this.gproom = gproom;
+        this.absstru = absstru;
+        this.absroom = absroom;
+        this.perc = perc;
+    }
     private int absstru;
     private int absroom;
     private int perc;

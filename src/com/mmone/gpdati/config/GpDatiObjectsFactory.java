@@ -5,10 +5,14 @@
  */
 package com.mmone.gpdati.config;
 
+import com.mmone.gpdati.allotment.GpDatiUpdateRunner;
 import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
 import com.mmone.gpdati.allotment.reader.AllotmentLineProvvider;
 import com.mmone.gpdati.allotment.record.AllotmentRecordsListBuilder;
 import com.mmone.hsqldb.Database;
+import com.mmone.otasoapui.AllotmentUpdatePropertiesCollector;
+import com.mmone.otasoapui.MissingParametersException;
+import com.mmone.otasoapui.SoapUiPropertiesCollector;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,28 +23,58 @@ import org.apache.xmlrpc.XmlRpcClient;
  * @author mauro.larese
  */
 public class GpDatiObjectsFactory {
-    GpDatiXmlRpcConfigurator xmlRpcConfigurator=null;
-    Database database=null; 
-    GpDatiProperties properties;
-    GpdDbRoomMap roomMap=null;
-    XmlRpcClient xmlRpcClient=null; 
-    AllotmentRecordsListBuilder allotmentRecordsListBuilder = null;
-
-    public AllotmentRecordsListBuilder getAllotmentRecordsListBuilder() {
+    private GpDatiXmlRpcConfigurator xmlRpcConfigurator=null;
+    private Database database=null; 
+    private GpDatiProperties properties=null;
+    private GpDatiDbRoomMap roomMap=null;
+    private XmlRpcClient xmlRpcClient=null; 
+    private AllotmentRecordsListBuilder allotmentRecordsListBuilder = null;
+    private GpDatiUpdateRunner gpdUpdateRunner=null;
+    private static GpDatiObjectsFactory instance=null;
+    
+    public static GpDatiObjectsFactory getInstance(){
+        if(instance==null)
+            instance = new GpDatiObjectsFactory();
+        return instance;
+    }
+    
+    public GpDatiUpdateRunner getUpdateRunner() throws MissingParametersException{
+        if(gpdUpdateRunner==null){
+            gpdUpdateRunner= new GpDatiUpdateRunner( getProperties());
+        }     
+        return gpdUpdateRunner;
+    }
+    
+    public AllotmentRecordsListBuilder getAllotmentRecordsListBuilder() throws MissingParametersException {
         if(allotmentRecordsListBuilder==null){
-            AllotmentLineProvvider afr = new AllotmentFileReader(properties.getAvailFileName()); 
-            allotmentRecordsListBuilder = new AllotmentRecordsListBuilder(afr);
+            AllotmentLineProvvider afr = new AllotmentFileReader(getProperties().getAvailFileName()); 
+            allotmentRecordsListBuilder = new AllotmentRecordsListBuilder(afr,this.getRoomMap());
         }
         return allotmentRecordsListBuilder;
     }
             
-    public GpdDbRoomMap getRoomMap() {
+    public AllotmentUpdatePropertiesCollector getAllotmentUpdatePropertiesCollector() 
+            throws MissingParametersException {
+        AllotmentUpdatePropertiesCollector prp = new SoapUiPropertiesCollector(); 
+        if(prp.hasError()){
+            throw new MissingParametersException(prp.getErrorMessage() );
+        }
+        
+        return prp;
+    }
+    
+    public GpDatiDbRoomMap getRoomMap() throws MissingParametersException {
         if(roomMap==null)
-            roomMap = new GpdDbRoomMap( getDatabase());
+            roomMap = new GpDatiDbRoomMap( getDatabase());
         return roomMap;
     }
 
-     
+    public GpDatiProperties getProperties() throws MissingParametersException {
+        if(properties==null)
+            properties = new GpDatiProperties( this.getAllotmentUpdatePropertiesCollector() );
+        return properties;
+    }
+ 
     public void cleanUp(){
         try {
             if(database!=null){
@@ -53,13 +87,21 @@ public class GpDatiObjectsFactory {
             Logger.getLogger(GpDatiObjectsFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public GpDatiObjectsFactory(GpDatiProperties properties ) {  
-        this.properties=properties;
+    public GpDatiObjectsFactory(  ) {  
+         
     }
     
-    public GpDatiXmlRpcConfigurator getGpDatiXmlRpcConfigurator()  {
+    public GpDatiObjectsFactory( GpDatiProperties prp ) {  
+        this.properties = prp; 
+    }
+    
+    public GpDatiObjectsFactory(AllotmentUpdatePropertiesCollector updProperties ) {  
+        this(new GpDatiProperties( updProperties ));
+    }
+    
+    public GpDatiXmlRpcConfigurator getGpDatiXmlRpcConfigurator() throws MissingParametersException  {
         if(xmlRpcConfigurator==null)
-            xmlRpcConfigurator=new GpDatiXmlRpcConfigurator( properties );
+            xmlRpcConfigurator=new GpDatiXmlRpcConfigurator( this.getProperties() );
         return xmlRpcConfigurator;
     }
     
@@ -69,10 +111,11 @@ public class GpDatiObjectsFactory {
         
         return xmlRpcClient;
     }
-    
-    public Database getDatabase() {
-        if(database==null)
-            database=new Database(properties.getDbPath());
+     
+    public Database getDatabase() throws MissingParametersException {
+        if(database==null){
+            database=new Database(this.getProperties().getDbPath()); 
+        }    
         return database;
     }
     

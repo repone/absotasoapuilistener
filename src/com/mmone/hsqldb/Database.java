@@ -32,18 +32,38 @@ public class Database {
         try {
             setup();
         } catch (SQLException ex) {
+            System.out.println("Error - " + ex.getMessage());
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     private void setup() throws SQLException{
         JDBCDataSource ds = new JDBCDataSource();
-        ds.setDatabase("jdbc:hsqldb:" + dbParh);
+        ds.setDatabase("jdbc:hsqldb:file:" + dbParh);
         conn = ds.getConnection("sa", "");
+        if(conn==null){
+            System.out.println("conn not created");
+        }
         qr = new QueryRunner(ds);
+          
     }
     
+    public void rollback() throws SQLException{
+        if(conn!=null){
+            conn.rollback();
+        }
+    }
+    public void commit() throws SQLException{
+        if(conn!=null){
+            conn.commit();
+        }
+    }
     public void shutDown() throws SQLException{
-        qr.update("SHUTDOWN");
-        DbUtils.close(conn);
+        if(conn!=null){
+            qr.update("SHUTDOWN");
+            DbUtils.close(conn);
+        }else{
+            System.out.println("conn alredy closed");
+        }
+        
     }
 }

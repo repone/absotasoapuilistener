@@ -6,7 +6,11 @@
 package com.mmone.gpdati.config;
 
 import com.mmone.gpdati.allotment.record.AllotmentRecord;
+import com.mmone.otasoapui.AllotmentUpdatePropertiesCollector;
+import com.mmone.otasoapui.SoapUiPropertiesCollector;
 import java.util.List;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.MapUtils;
 
 /**
  *
@@ -14,9 +18,14 @@ import java.util.List;
  */
 public class GpDatiDataProvvider {
     GpDatiObjectsFactory componentsFactory;
+ 
+    public GpDatiDataProvvider(AllotmentUpdatePropertiesCollector ap) {
+        this(new GpDatiProperties(ap));
+    }
+
     
     public GpDatiDataProvvider(GpDatiProperties p) {
-        this.componentsFactory= new GpDatiObjectsFactory(p);
+        this(new GpDatiObjectsFactory(p));
     }
 
     public GpDatiDataProvvider(GpDatiObjectsFactory componentsFactory) {
@@ -27,11 +36,12 @@ public class GpDatiDataProvvider {
         return componentsFactory.getAllotmentRecordsListBuilder().getRecords();
     }
     
-    public GpdDbRoomMap getRoomMap() throws Exception{
+    public GpDatiDbRoomMap getRoomMap() throws Exception{
         return componentsFactory.getRoomMap();
     }
     
     public void cleanUp(){
         componentsFactory.cleanUp();
     }
+     
 }

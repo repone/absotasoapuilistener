@@ -5,8 +5,8 @@
  */
 package com.mmone.gpdati.allotment;
 
-import com.mmone.gpdati.config.GpdDbRoomMap;
-import com.mmone.gpdati.config.GpdRoomRecord;
+import com.mmone.gpdati.config.GpDatiDbRoomMap;
+import com.mmone.gpdati.config.GpDatiRoomRecord;
 import com.mmone.hsqldb.Database;
 import java.sql.SQLException;
 import java.util.Hashtable;
@@ -20,24 +20,24 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
  *
  * @author mauro.larese
  */
-public class GpdDbDispoMap extends Hashtable<String, GpdDispoRecord>{
+public class GpDatiDbDispoMap extends Hashtable<String, GpDatiDispoRecord>{
     Database database;
-    public GpdDbDispoMap(Database database) {
+    public GpDatiDbDispoMap(Database database) {
         this.database = database;
         try {
             loadAll();
         } catch (SQLException ex) {
-            Logger.getLogger(GpdDispoRecord.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GpDatiDispoRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     private void loadAll() throws SQLException{
         String query = "SELECT * FROM PUBLIC.GPDATI_DISPO";
-        ResultSetHandler<List<GpdDispoRecord>> h = 
-                new BeanListHandler<GpdDispoRecord>(GpdDispoRecord.class);
+        ResultSetHandler<List<GpDatiDispoRecord>> h = 
+                new BeanListHandler<GpDatiDispoRecord>(GpDatiDispoRecord.class);
 
-        List<GpdDispoRecord>recs=database.getQueryRunner().query(query,h);
+        List<GpDatiDispoRecord>recs=database.getQueryRunner().query(query,h);
         
-        for (GpdDispoRecord rec : recs) {
+        for (GpDatiDispoRecord rec : recs) {
             this.put(rec.getKey(),rec);
         } 
     }
