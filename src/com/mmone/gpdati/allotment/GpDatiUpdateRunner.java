@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  *
@@ -39,9 +40,12 @@ public class GpDatiUpdateRunner {
         startup(); 
         
         try {
-            //lettura file GPDATI e parse file  
+            //lettura file GPDATI    
             List<AllotmentRecord> gpdAvail = dataProvvider.getAllotmentRecordList(); 
-            //for (AllotmentRecord av : gpdAvail)  System.out.println(av); 
+            for (AllotmentRecord allotmentRecord : gpdAvail) {
+                
+            }
+ 
             
         } catch (FileNotFoundException efnf) {
             cleanup();
@@ -50,14 +54,8 @@ public class GpDatiUpdateRunner {
             cleanup();
             throw new UpdateRunException(ex.getClass().getName() + " "+ ex.getMessage()); 
         }
-         
-        //Recupero configurazione mappatura
-        //leggo indice precedente delle modifiche
-        //AGGIORNAMENTO ALLOTMENT
-        //svuoto il db con gli indici 
-        //creo gli indici
-        System.out.println("ok and cleanup");
-        Logger.getLogger(getClass().getName()).log(Level.INFO, "cleanup");
+          
+        
         cleanup();
     }
 }

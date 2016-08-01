@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  *
@@ -51,15 +52,19 @@ public class AllotmentRecordsListBuilder {
                  if(room!=null){ 
                      h= new Integer(room.getAbsstru()).toString() ;
                      rc= new Integer(room.getAbsroom()).toString() ;
+                     
                  }else{
                      room=roomMap.insert(h, rc);
                  }
                  if(!h.equals("0") && !rc.equals("0")){
+                     int allotment =  al * room.getPerc()/100;
+                     allotment=(int)Math.round(allotment*10000   )/10000;
+                     
                      r
                         .setHotel( h )
                         .setRcode( rc )
                         .setDate(dt)
-                        .setAllotment( al )
+                        .setAllotment( allotment )
                     ;
                     records.add(r);
                  }
@@ -77,6 +82,10 @@ public class AllotmentRecordsListBuilder {
     }
     
     public static void main(String[] args) {
+        double d =13 ; 
+        int di= (int)Math.round(d*10000   )/10000;
+        System.out.println("long="+di);
+        if(true)return;
         AllotmentLineProvvider afr = new AllotmentFileReader("C:/svnprjects/mauro_netbprj/abs-ota-soapui-listener/test/FILE_DISPO__20160616.txt"); 
         AllotmentRecordsListBuilder arlb = new AllotmentRecordsListBuilder(afr);
         try {

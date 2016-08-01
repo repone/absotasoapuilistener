@@ -24,7 +24,12 @@ public class AllotmentRecord {
 
     public AllotmentRecord() {
     }
-
+     
+    public boolean isValidRecord(){ 
+        if(hotel==null || hotel.equals("0")) return false;
+        if(rcode==null || rcode.equals("0")) return false;
+        return true;
+    }
     public String getRcode() {
         return rcode;
     }

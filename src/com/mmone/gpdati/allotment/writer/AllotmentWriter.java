@@ -13,5 +13,5 @@ import java.util.List;
  * @author mauro.larese
  */
 public interface AllotmentWriter {
-    void writeAllotment(List<AllotmentRecord>allotments) throws ErrorWritingAllotmentException;
+    void writeAllotments(List<AllotmentRecord>allotments) throws ErrorWritingAllotmentException;
 }

@@ -10,7 +10,11 @@ import com.mmone.gpdati.config.GpDatiProperties;
 import com.mmone.gpdati.config.GpDatiXmlRpcConfigurator;
 import com.mmone.gpdati.config.XmlRpcConfigErrorException;
 import com.mmone.gpdati.config.XmlRpcConfigurator;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -22,6 +26,8 @@ import org.apache.xmlrpc.XmlRpcClient;
 public class XmlrpcAllotmentWriter implements AllotmentWriter{
     private XmlRpcClient rpcClient;
     private XmlRpcConfigurator configurator;
+    public static final String AVAIL_ACTION_SET = "set";
+    public static final int XRPC_SET_ALLOTMENT_RESULT_ERROR = -1;
     
     public XmlrpcAllotmentWriter(XmlRpcConfigurator configurator ) {
         try {
@@ -32,36 +38,80 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
     }
     
     @Override
-    public void writeAllotment(List<AllotmentRecord>allotments) throws ErrorWritingAllotmentException {
+    public void writeAllotments(List<AllotmentRecord>allotments) throws ErrorWritingAllotmentException {
         for (AllotmentRecord allotment : allotments) {
-            
-            /*
-            try {
-                
-                
-                AvailCrud.saveAllotment(
-                    rpcClient,
-                    allotment.getHotel(),
-                    allotment.getJDate(),
-                    allotment.getJDate(),
-                    allotment.getRcode(), 
-                    allotment.getAllotment()
-                );
-            } catch (ParseException ex) {
-                Logger.getLogger(XmlrpcAllotmentWriter.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
+            writeAllotment(allotment);
         }
+    }
+    
+    public void writeAllotment(AllotmentRecord record) throws ErrorWritingAllotmentException {
+        
+    }
+    
+    private int modifyAllotment( 
+            java.util.Date dateStart,
+            java.util.Date dateEnd,
+            String action,
+            int availability,
+            int reservation,
+            Integer invCode,
+            Integer hotelCode){
+        
+        Vector parameters=new Vector();   
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        parameters.add(new Integer(hotelCode)); //1
+        parameters.add(new Integer(invCode)); //2
+     
+        int rate = 1; 
+        parameters.add(new Integer(rate)); //3 offerta
+        parameters.add(new Integer(availability)); //4 disponibilità
+        parameters.add(new Integer(reservation)); //5 prenotazione
+        parameters.add(action); //6  Azione : set,increase,decrease
+        parameters.add(df.format(dateStart).toString());  //7
+        parameters.add(df.format(dateEnd).toString());  //8
+        Vector result = new Vector();
+        int ret = XRPC_SET_ALLOTMENT_RESULT_ERROR;
+        
+        String logData = 
+                        "hotelCode="+hotelCode
+                    +   " - invCode="+invCode
+                    +   " - offerta="+rate
+                    +   " - availability="+availability
+                    +   " - reservation="+reservation
+                    +   " - action="+action
+                    +   " - dateStart="+df.format(dateStart).toString()
+                    +   " - dateEnd="+df.format(dateEnd).toString()
+                    
+                    
+            ;         
+            
+        try { 
+            result = (Vector) rpcClient.execute("backend.modifyAllotment", parameters); 
+             
+        } catch (Exception e) {
+            Logger.getLogger("AvailCrud").log(Level.SEVERE, "", e);
+            return ret ;
+        }
+        
+        try{
+            Map hret = (Map)result.get(0); 
+            ret = new Integer(  (String)hret.get("unique_allotment_service_response") );  
+        }catch(Exception e){   }
+         
+        Map hret = (Map)result.get(0); 
+        ret = new Integer(  (String)hret.get("unique_allotment_service_response") );  
+        Logger.getLogger("AvailCrud").log(Level.INFO, "Xrpc done " );
+   
+        return ret;
     }
     
     public static void main(String[] args) {
           
-        try {
-            GpDatiProperties prop = new GpDatiProperties("otauser","8eWruyEN","http://reservation.cmsone.it/backend/manager/xmlrpc/ser.php");
-            XmlRpcConfigurator configurator = new GpDatiXmlRpcConfigurator(prop);
-            XmlRpcClient rpc = configurator.configureRpcClient();
-        } catch (XmlRpcConfigErrorException ex) {
-            Logger.getLogger(XmlrpcAllotmentWriter.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        GpDatiProperties prop = new GpDatiProperties("otauser","8eWruyEN","http://reservation.cmsone.it/backend/manager/xmlrpc/ser.php");
+        XmlRpcConfigurator configurator = new GpDatiXmlRpcConfigurator(prop); 
+        XmlrpcAllotmentWriter aw = new XmlrpcAllotmentWriter(configurator);
+         
          
     }
 }
