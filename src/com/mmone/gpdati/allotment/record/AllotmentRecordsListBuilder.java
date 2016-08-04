@@ -9,10 +9,19 @@ import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
 import com.mmone.gpdati.allotment.reader.AllotmentLineProvvider;
 import com.mmone.gpdati.config.GpDatiDbRoomMap;
 import com.mmone.gpdati.config.GpDatiRoomRecord;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 /**
@@ -22,6 +31,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 public class AllotmentRecordsListBuilder {
     private AllotmentLineProvvider linePrv;
     private List<AllotmentRecord> records=null;
+    private List<AllotmentRecord> grpRecords=null;
+    private Map<String,List<AllotmentRecord>> recordsMap=null;
     private GpDatiDbRoomMap roomMap=null;
     
     public AllotmentRecordsListBuilder(AllotmentLineProvvider linePrv) {
@@ -34,6 +45,7 @@ public class AllotmentRecordsListBuilder {
     private void buildRecordList() throws Exception{
         List<String> lines = linePrv.getLines();
         records = new ArrayList<AllotmentRecord>();
+        recordsMap=new Hashtable<String, List<AllotmentRecord>>();
         
         for (String line : lines) {
             AllotmentRecord r = new AllotmentRecord();
@@ -49,14 +61,16 @@ public class AllotmentRecordsListBuilder {
             
             if(roomMap!=null){
                  GpDatiRoomRecord room= roomMap.get(h, rc); 
+                 int sid=0;
+                 int roomId=0;
                  if(room!=null){ 
-                     h= new Integer(room.getAbsstru()).toString() ;
-                     rc= new Integer(room.getAbsroom()).toString() ;
+                     sid= new Integer(room.getAbsstru())  ;
+                     roomId= new Integer(room.getAbsroom())  ;
                      
                  }else{
                      room=roomMap.insert(h, rc);
                  }
-                 if(!h.equals("0") && !rc.equals("0")){
+                 if(sid!=0 && roomId!=0){
                      int allotment =  al * room.getPerc()/100;
                      allotment=(int)Math.round(allotment*10000   )/10000;
                      
@@ -65,13 +79,32 @@ public class AllotmentRecordsListBuilder {
                         .setRcode( rc )
                         .setDate(dt)
                         .setAllotment( allotment )
+                        .setHotelId(sid)
+                        .setRoomId(roomId) ;
                     ;
                     records.add(r);
                  }
                  
+            }else{
+                r
+                        .setHotel( h )
+                        .setRcode( rc )
+                        .setDate(dt)
+                        .setAllotment( al );
+                
+                records.add(r);
             }
             
+            String smallKey = r.getSmallGroupKey() ;
+            List<AllotmentRecord>lr;
+            if(  recordsMap.containsKey(  smallKey  )  ){
+                lr=recordsMap.get(smallKey) ;
+            }else{
+                lr = new ArrayList<AllotmentRecord>(); 
+                recordsMap.put(smallKey,lr);
+            }
             
+            lr.add(r);
         }
          
     }
@@ -81,20 +114,47 @@ public class AllotmentRecordsListBuilder {
         return records;
     }
     
+    public List<AllotmentRecord> getGroupedRecords() throws Exception{
+        if(grpRecords == null){
+            grpRecords = new ArrayList<AllotmentRecord>();
+            buildRecordList();
+            AllotmentRecordListRegrouper rgp = new AllotmentRecordListRegrouper(recordsMap);
+             
+            for (Map.Entry<String, AllotmentRecord> entry : rgp.entrySet()) { 
+                AllotmentRecord rec = entry.getValue();
+                
+                if(rec.isValidRecord())
+                    grpRecords.add( rec ); 
+            } 
+            grpRecords.sort(new CompareAllotmentRecordByDate() );
+        }    
+        return grpRecords;
+    }
+    
+    public Map<String,List<AllotmentRecord>> getMappedRecords() throws Exception{
+        if(recordsMap == null)
+            buildRecordList();
+         
+        return recordsMap;
+    }
+    
     public static void main(String[] args) {
-        double d =13 ; 
-        int di= (int)Math.round(d*10000   )/10000;
-        System.out.println("long="+di);
-        if(true)return;
-        AllotmentLineProvvider afr = new AllotmentFileReader("C:/svnprjects/mauro_netbprj/abs-ota-soapui-listener/test/FILE_DISPO__20160616.txt"); 
-        AllotmentRecordsListBuilder arlb = new AllotmentRecordsListBuilder(afr);
+         
+        AllotmentLineProvvider afr = new AllotmentFileReader("D:/tmp_desktop/scrigno-gpdati/FILE_DISPO__20160802.txt"); 
+        AllotmentRecordsListBuilder arlb = new AllotmentRecordsListBuilder(afr); 
+        
+         
         try {
-            List<AllotmentRecord>records= arlb.getRecords();
+            List<AllotmentRecord>records= arlb.getGroupedRecords();
             System.out.println( "Records in list " + records.size()  );
-            for (AllotmentRecord record : records) { 
-                System.out.println( record );
-                System.out.println( "date YMD=" + record.getDateYMD() );
-            }
+             
+            if(true)
+                for (AllotmentRecord record : records) {  
+                    System.out.println( "---- " + record.getCompleteKey()); 
+                }
+             
+            //MapUtils.debugPrint(System.out , "MAP", arlb.getMappedRecords());
+            //MapUtils.debugPrint(System.out , "MAP", reg);
         } catch (Exception ex) {
             Logger.getLogger(AllotmentRecordsListBuilder.class.getName()).log(Level.SEVERE, null, ex);
         }

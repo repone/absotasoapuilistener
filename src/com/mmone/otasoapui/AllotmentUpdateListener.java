@@ -9,6 +9,8 @@ import com.mmone.gpdati.allotment.GpDatiUpdateRunner;
 import com.mmone.gpdati.allotment.UpdateRunException;
 import com.mmone.gpdati.allotment.record.GpDatiAllotmentFileNotFoundException;
 import com.mmone.gpdati.config.GpDatiObjectsFactory;
+import com.mmone.gpdati.config.GpDatiObjectsFactoryNullException;
+import com.mmone.gpdati.config.GpDatiProperties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -25,17 +27,20 @@ public class AllotmentUpdateListener implements  RequestFilter{
         String p = (String)SoapUI.getGlobalProperties().getPropertyValue("update.done");
         if(p==null){ 
             try {  
-                System.out.println("update can start");
-                GpDatiObjectsFactory.getInstance().getUpdateRunner().run();
+                System.out.println("update can start"); 
                 SoapUI.getGlobalProperties().setPropertyValue("update.done","true"); 
-            } catch (MissingParametersException ex) {
-                Logger.getLogger(AllotmentUpdateListener.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (UpdateRunException ex) {
-                Logger.getLogger(AllotmentUpdateListener.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GpDatiAllotmentFileNotFoundException ex) {
-                Logger.getLogger(AllotmentUpdateListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            System.out.println( "update end");
+                GpDatiObjectsFactory
+                        .getInstance(new GpDatiProperties(new SoapUiPropertiesCollector()))
+                        .getUpdateRunner().run();
+                System.out.println("update run end");
+                
+            } catch (Exception ex) {
+                System.out.println("update run exception " + ex.getClass().getName() +ex.getMessage());
+                System.out.println("Stopping runner ..."); 
+            }finally{
+                System.out.println( "update end");
+            }   
+            
         }else{
             System.out.println("update alredy started");
         } 

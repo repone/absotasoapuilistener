@@ -11,6 +11,7 @@ import com.mmone.gpdati.config.GpDatiXmlRpcConfigurator;
 import com.mmone.gpdati.config.XmlRpcConfigErrorException;
 import com.mmone.gpdati.config.XmlRpcConfigurator;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +41,28 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
     @Override
     public void writeAllotments(List<AllotmentRecord>allotments) throws ErrorWritingAllotmentException {
         for (AllotmentRecord allotment : allotments) {
-            writeAllotment(allotment);
+            if(allotment.isValidRecord())
+                writeAllotment(allotment);
         }
     }
     
     public void writeAllotment(AllotmentRecord record) throws ErrorWritingAllotmentException {
+        try {
+             
+            if(!record.isValidRecord()) return;
+            
+            modifyAllotment(
+                    record.getJDate(),
+                    record.getJDateTo(),
+                    "set",
+                    record.getAllotment(),
+                    0,
+                    record.getRoomId(),
+                    record.getHotelId()
+            );
+        } catch (ParseException ex) {
+            Logger.getLogger(XmlrpcAllotmentWriter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
     

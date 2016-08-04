@@ -3,14 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mmone.gpdati.allotment;
+package com.mmone.gpdati.allotment; 
 
 import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
 import com.mmone.gpdati.allotment.record.AllotmentRecord;
 import com.mmone.gpdati.allotment.record.GpDatiAllotmentFileNotFoundException;
+import com.mmone.gpdati.allotment.writer.XmlrpcAllotmentWriter;
 import com.mmone.gpdati.config.GpDatiDataProvvider;
 import com.mmone.gpdati.config.GpDatiProperties;
 import com.mmone.gpdati.config.GpDatiDbRoomMap;
+import com.mmone.gpdati.config.GpDatiObjectsFactory;
+import com.mmone.gpdati.config.GpDatiObjectsFactoryNullException;
+import com.mmone.otasoapui.MissingParametersException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -25,33 +29,40 @@ import org.apache.commons.lang3.ArrayUtils;
 public class GpDatiUpdateRunner {
     private GpDatiProperties properties; 
     private GpDatiDataProvvider dataProvvider;
-    
+    private XmlrpcAllotmentWriter allotmentWriter ;
+    private static Logger logger=Logger.getLogger(GpDatiUpdateRunner.class.getName());
     public GpDatiUpdateRunner(GpDatiProperties properties) {
        this.properties = properties;   
     }
     
-    private void startup(){ 
-        dataProvvider = new GpDatiDataProvvider(properties);
+    private void startup() throws MissingParametersException{ 
+        GpDatiObjectsFactory f = GpDatiObjectsFactory.getInstance(properties);
+        dataProvvider = new GpDatiDataProvvider( f ); 
+        allotmentWriter = f.getXmlrpcAllotmentWriter(); 
     }
+    
     private void cleanup(){
         dataProvvider.cleanUp();
     }
-    public void run() throws UpdateRunException, GpDatiAllotmentFileNotFoundException{ 
+    
+    public void run() throws UpdateRunException, GpDatiAllotmentFileNotFoundException, MissingParametersException{ 
         startup(); 
         
         try {
             //lettura file GPDATI    
-            List<AllotmentRecord> gpdAvail = dataProvvider.getAllotmentRecordList(); 
-            for (AllotmentRecord allotmentRecord : gpdAvail) {
-                
-            }
- 
+            logger.log(Level.INFO, "getAllotmentRecordList");
+            List<AllotmentRecord> gpdAvail = dataProvvider.getAllotmentRecordList();  
             
+            logger.log(Level.INFO, "gpdAvail.size= "+gpdAvail.size());
+            allotmentWriter.writeAllotments(gpdAvail);
+             
         } catch (FileNotFoundException efnf) {
             cleanup();
+            logger.log(Level.SEVERE, "run", efnf);
             throw new GpDatiAllotmentFileNotFoundException(efnf.getClass().getName() + " "+ efnf.getMessage()); 
         } catch (Exception ex) {
             cleanup();
+            logger.log(Level.SEVERE, "run", ex);
             throw new UpdateRunException(ex.getClass().getName() + " "+ ex.getMessage()); 
         }
           

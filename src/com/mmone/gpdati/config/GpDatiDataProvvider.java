@@ -18,14 +18,14 @@ import org.apache.commons.collections.MapUtils;
  */
 public class GpDatiDataProvvider {
     GpDatiObjectsFactory componentsFactory;
- 
+
     public GpDatiDataProvvider(AllotmentUpdatePropertiesCollector ap) {
         this(new GpDatiProperties(ap));
     }
 
     
     public GpDatiDataProvvider(GpDatiProperties p) {
-        this(new GpDatiObjectsFactory(p));
+        this(    GpDatiObjectsFactory.getInstance(p)      );
     }
 
     public GpDatiDataProvvider(GpDatiObjectsFactory componentsFactory) {
@@ -33,7 +33,7 @@ public class GpDatiDataProvvider {
     }
     
     public List<AllotmentRecord> getAllotmentRecordList() throws Exception{
-        return componentsFactory.getAllotmentRecordsListBuilder().getRecords();
+        return componentsFactory.getAllotmentRecordsListBuilder().getGroupedRecords();
     }
     
     public GpDatiDbRoomMap getRoomMap() throws Exception{

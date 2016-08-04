@@ -9,6 +9,7 @@ import com.mmone.gpdati.allotment.GpDatiUpdateRunner;
 import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
 import com.mmone.gpdati.allotment.reader.AllotmentLineProvvider;
 import com.mmone.gpdati.allotment.record.AllotmentRecordsListBuilder;
+import com.mmone.gpdati.allotment.writer.XmlrpcAllotmentWriter;
 import com.mmone.hsqldb.Database;
 import com.mmone.otasoapui.AllotmentUpdatePropertiesCollector;
 import com.mmone.otasoapui.MissingParametersException;
@@ -31,10 +32,24 @@ public class GpDatiObjectsFactory {
     private AllotmentRecordsListBuilder allotmentRecordsListBuilder = null;
     private GpDatiUpdateRunner gpdUpdateRunner=null;
     private static GpDatiObjectsFactory instance=null;
+    private XmlrpcAllotmentWriter xmlrpcAllotmentWriter=null;
+
+    public XmlrpcAllotmentWriter getXmlrpcAllotmentWriter() throws MissingParametersException {
+        if(xmlrpcAllotmentWriter==null){
+            xmlrpcAllotmentWriter = new XmlrpcAllotmentWriter(getGpDatiXmlRpcConfigurator());
+        }
+        return xmlrpcAllotmentWriter;
+    }
     
-    public static GpDatiObjectsFactory getInstance(){
+    public static GpDatiObjectsFactory getInstance(GpDatiProperties p){
         if(instance==null)
-            instance = new GpDatiObjectsFactory();
+            instance = new GpDatiObjectsFactory(p);
+        return instance;
+    }
+    
+    public static GpDatiObjectsFactory getInstance() throws GpDatiObjectsFactoryNullException{ 
+        if(instance==null)
+            throw new GpDatiObjectsFactoryNullException("Factory not initialized use getInstance(gpDatiProperties)");
         return instance;
     }
     
@@ -86,9 +101,6 @@ public class GpDatiObjectsFactory {
         } catch (SQLException ex) {
             Logger.getLogger(GpDatiObjectsFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    public GpDatiObjectsFactory(  ) {  
-         
     }
     
     public GpDatiObjectsFactory( GpDatiProperties prp ) {  

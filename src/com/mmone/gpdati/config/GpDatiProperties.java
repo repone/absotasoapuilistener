@@ -6,6 +6,7 @@
 package com.mmone.gpdati.config;
 
 import com.mmone.otasoapui.AllotmentUpdatePropertiesCollector;
+import com.mmone.otasoapui.SoapUiPropertiesCollector;
 import java.util.Date;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -23,7 +24,7 @@ public class GpDatiProperties {
     private String dbPath; 
     private String availFileName; 
     private boolean availUpdated; 
-    
+     
     public GpDatiProperties(AllotmentUpdatePropertiesCollector p) {
         this( p.getRpcUser(),p.getRpcPwd(),p.getRpcUrl(),p.getDbPath(),p.getAvailFile());
     }
