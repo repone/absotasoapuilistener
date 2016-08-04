@@ -46,34 +46,25 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
         }
     }
     
-    public void writeAllotment(AllotmentRecord record) throws ErrorWritingAllotmentException {
-        try {
-             
-            if(!record.isValidRecord()) return;
+    public int writeAllotment(AllotmentRecord record) throws ErrorWritingAllotmentException {
+        try { 
+            if(!record.isValidRecord()) return -2; 
+            //System.out.println("--- " + record.getLongCompleteKey());if(true) return;
             
-            modifyAllotment(
-                    record.getJDate(),
-                    record.getJDateTo(),
-                    "set",
-                    record.getAllotment(),
-                    0,
-                    record.getRoomId(),
-                    record.getHotelId()
-            );
+            return modifyAllotment( record , "set");
         } catch (ParseException ex) {
             Logger.getLogger(XmlrpcAllotmentWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        return -1;
     }
     
-    private int modifyAllotment( 
-            java.util.Date dateStart,
-            java.util.Date dateEnd,
-            String action,
-            int availability,
-            int reservation,
-            Integer invCode,
-            Integer hotelCode){
+    private int modifyAllotment(AllotmentRecord record , String action) throws ParseException{
+        java.util.Date dateStart=record.getJDate();
+        java.util.Date dateEnd=record.getJDateTo(); 
+        int availability=record.getAllotment();
+        int reservation=0;
+        Integer invCode=record.getRoomId();
+        Integer hotelCode=record.getHotelId();
         
         Vector parameters=new Vector();   
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -106,9 +97,12 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
             
         try { 
             result = (Vector) rpcClient.execute("backend.modifyAllotment", parameters); 
-             
+            System.out.println("updated "+record.getLongCompleteKey()); 
         } catch (Exception e) {
-            Logger.getLogger("AvailCrud").log(Level.SEVERE, "", e);
+            System.out.println("----------------------------");
+            System.out.println("Error record " + record.getLongCompleteKey());
+            System.out.println(e.getClass().getName() + " "+e.getMessage() );
+            System.out.println("----------------------------");
             return ret ;
         }
         
@@ -120,7 +114,8 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
         Map hret = (Map)result.get(0); 
         ret = new Integer(  (String)hret.get("unique_allotment_service_response") );  
         Logger.getLogger("AvailCrud").log(Level.INFO, "Xrpc done " );
-   
+        
+        System.out.println("------- Xrpc done ="+ret);
         return ret;
     }
     
