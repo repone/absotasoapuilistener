@@ -54,11 +54,11 @@ public class GpDatiUpdateRunner {
              
         } catch (FileNotFoundException efnf) {
             cleanup();
-            logger.log(Level.SEVERE, "run", efnf);
+            logger.log(Level.SEVERE, "run", efnf.getMessage());
             throw new GpDatiAllotmentFileNotFoundException(efnf.getClass().getName() + " "+ efnf.getMessage()); 
         } catch (Exception ex) {
             cleanup();
-            logger.log(Level.SEVERE, "run", ex);
+            logger.log(Level.SEVERE, "run", ex.getMessage());
             throw new UpdateRunException(ex.getClass().getName() + " "+ ex.getMessage()); 
         }
           
