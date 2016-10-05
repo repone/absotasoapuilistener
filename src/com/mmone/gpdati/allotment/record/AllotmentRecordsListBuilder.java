@@ -11,6 +11,7 @@ import com.mmone.gpdati.config.GpDatiDbRoomMap;
 import com.mmone.gpdati.config.GpDatiRoomRecord;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
@@ -126,7 +127,8 @@ public class AllotmentRecordsListBuilder {
                 if(rec.isValidRecord())
                     grpRecords.add( rec ); 
             } 
-            grpRecords.sort(new CompareAllotmentRecordByDate() );
+            Collections.sort(grpRecords,new CompareAllotmentRecordByDate());
+            //grpRecords.sort(new CompareAllotmentRecordByDate() );
         }    
         return grpRecords;
     }
