@@ -65,7 +65,6 @@ public class GpDatiUpdateRunner {
             SoapUI.log.info( ex.getMessage());
             throw new UpdateRunException(ex.getClass().getName() + " "+ ex.getMessage()); 
         }
-          
         
         cleanup();
     }
