@@ -5,6 +5,7 @@
  */
 package com.mmone.gpdati.allotment; 
 
+import com.eviware.soapui.SoapUI;
 import com.mmone.gpdati.allotment.record.AllotmentRecord;
 import com.mmone.gpdati.allotment.record.GpDatiAllotmentFileNotFoundException;
 import com.mmone.gpdati.allotment.writer.XmlrpcAllotmentWriter;
@@ -45,6 +46,9 @@ public class GpDatiUpdateRunner {
         startup(); 
         
         try {
+            SoapUI.log.info( "=========================================================");
+            SoapUI.log.info( "                     update started ");
+            SoapUI.log.info( "=========================================================");
             //lettura file GPDATI    
             logger.log(Level.INFO, "getAllotmentRecordList");
             List<AllotmentRecord> gpdAvail = dataProvvider.getAllotmentRecordList();  
@@ -54,11 +58,11 @@ public class GpDatiUpdateRunner {
              
         } catch (FileNotFoundException efnf) {
             cleanup();
-            logger.log(Level.SEVERE, "run", efnf.getMessage());
+            SoapUI.log.info( efnf.getMessage());
             throw new GpDatiAllotmentFileNotFoundException(efnf.getClass().getName() + " "+ efnf.getMessage()); 
         } catch (Exception ex) {
             cleanup();
-            logger.log(Level.SEVERE, "run", ex.getMessage());
+            SoapUI.log.info( ex.getMessage());
             throw new UpdateRunException(ex.getClass().getName() + " "+ ex.getMessage()); 
         }
           

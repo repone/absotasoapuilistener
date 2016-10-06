@@ -5,6 +5,7 @@
  */
 package com.mmone.gpdati.allotment.record;
 
+import com.eviware.soapui.SoapUI;
 import com.mmone.gpdati.allotment.reader.AllotmentFileReader;
 import com.mmone.gpdati.allotment.reader.AllotmentLineProvvider;
 import com.mmone.gpdati.config.GpDatiDbRoomMap;
@@ -158,6 +159,7 @@ public class AllotmentRecordsListBuilder {
             //MapUtils.debugPrint(System.out , "MAP", arlb.getMappedRecords());
             //MapUtils.debugPrint(System.out , "MAP", reg);
         } catch (Exception ex) {
+            SoapUI.log.info(ex.getMessage());
             Logger.getLogger(AllotmentRecordsListBuilder.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

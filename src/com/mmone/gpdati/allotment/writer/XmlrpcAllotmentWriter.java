@@ -5,6 +5,7 @@
  */
 package com.mmone.gpdati.allotment.writer;
 
+import com.eviware.soapui.SoapUI;
 import com.mmone.gpdati.allotment.record.AllotmentRecord;
 import com.mmone.gpdati.config.GpDatiProperties;
 import com.mmone.gpdati.config.GpDatiXmlRpcConfigurator;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.log4j.FileAppender;
 import org.apache.xmlrpc.XmlRpcClient;
 
 /**
@@ -81,28 +83,26 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
         parameters.add(df.format(dateEnd).toString());  //8
         Vector result = new Vector();
         int ret = XRPC_SET_ALLOTMENT_RESULT_ERROR;
-        
+     
         String logData = 
-                        "hotelCode="+hotelCode
-                    +   " - invCode="+invCode
-                    +   " - offerta="+rate
-                    +   " - availability="+availability
-                    +   " - reservation="+reservation
-                    +   " - action="+action
-                    +   " - dateStart="+df.format(dateStart).toString()
-                    +   " - dateEnd="+df.format(dateEnd).toString()
-                    
-                    
-            ;         
-            
+                    "hotelCode="+hotelCode
+                +   " - invCode="+invCode
+                +   " - offerta="+rate
+                +   " - availability="+availability
+                +   " - reservation="+reservation
+                +   " - action="+action
+                +   " - dateStart="+df.format(dateStart).toString()
+                +   " - dateEnd="+df.format(dateEnd).toString() 
+        ;         
+             
         try { 
             result = (Vector) rpcClient.execute("backend.modifyAllotment", parameters); 
-            System.out.println("updated "+record.getLongCompleteKey()); 
+            SoapUI.log.info("logger availability updated "+record.getLongCompleteKey());  
         } catch (Exception e) {
-            System.out.println("----------------------------");
-            System.out.println("Error record " + record.getLongCompleteKey());
-            System.out.println(e.getClass().getName() + " "+e.getMessage() );
-            System.out.println("----------------------------");
+            SoapUI.log.info("----------------------------");
+            SoapUI.log.info("Error record " + record.getLongCompleteKey());
+            SoapUI.log.info(e.getClass().getName() + " "+e.getMessage() );
+            SoapUI.log.info("----------------------------");
             return ret ;
         }
         
@@ -115,7 +115,7 @@ public class XmlrpcAllotmentWriter implements AllotmentWriter{
         ret = new Integer(  (String)hret.get("unique_allotment_service_response") );  
         Logger.getLogger("AvailCrud").log(Level.INFO, "Xrpc done " );
         
-        System.out.println("------- Xrpc done ="+ret);
+        SoapUI.log.info("Xrpc result ="+ret);
         return ret;
     }
     
